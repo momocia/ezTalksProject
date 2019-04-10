@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Server</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/elephant_styles.css">
+    <style>
+        body{
+            text-align: center;
+        }
+        .container1{
+            position: absolute;      /*绝对定位*/
+            top: 50%;                  /* 距顶部50%*/
+            left: 50%;                  /* 距左边50%*/
+            height: 200px;  margin-top: -80px;   /*margin-top为height一半的负值*/
+            width: 400px;  margin-left: -200px;    /*margin-left为width一半的负值*/
+            z-index: 9999;
+        }
+
+        .error {
+            color: red;
+            display: block;
+            line-height: 20px;
+            font-size: 14px;
+            /*margin-bottom: 5px;*/
+        }
+
+    </style>
+
+</head>
+<body >
+    <div class="container1">
+          <div class="form-group">
+            <label for="username" style="display: inline-block;width: 120px;text-align: right">Email address :</label>
+            <input type="email" name="username" class="form-control" id="username" placeholder="Email" style="width: 200px;display: inline-block">
+          </div>
+          <div class="form-group">
+            <label for="password" style="display: inline-block;width: 120px;text-align: right">Password :</label>
+            <input type="password" name="password" class="form-control" id="password" placeholder="Password" style="width: 200px;display: inline-block">
+            <span id="errMsg" style="padding-left:160px;margin-top:5px;width: 400px;display: none;text-align: left">错误人提示</span>
+          </div>
+        <!--<div>-->
+            <!--<label for="errMsg" style="display: inline-block;width: 120px;text-align: right"></label>-->
+            <!---->
+          <!--</div>-->
+          <div class="checkbox">
+            <label>
+              <input type="checkbox"> Remember me
+            </label>
+          </div>
+          <button type="submit" class="btn btn-default" id="loginCheck">Sign in</button>
+    </div>
+    <div class="ele-container">
+      <div class="ele-wrapper">
+        <div class="ele-tail"></div>
+        <div class="ele-body">
+          <div class="ele-head">
+            <div class="ele-eyebrows"></div>
+            <div class="ele-eyes"></div>
+            <div class="ele-mouth"></div>
+            <div class="ele-fang-front"></div>
+            <div class="ele-fang-back"></div>
+            <div class="ele-ear"></div>
+          </div>
+        </div>
+        <div class="ele-leg-1 ele-leg-back">
+          <div class="ele-foot"></div>
+        </div>
+        <div class="ele-leg-2 ele-leg-front">
+          <div class="ele-foot"></div>
+        </div>
+        <div class="ele-leg-3 ele-leg-back">
+          <div class="ele-foot"></div>
+        </div>
+        <div class="ele-leg-4 ele-leg-front">
+          <div class="ele-foot"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+    <script>
+/*        import { withRouter } from 'react-router-dom';
+        import React, { Component } from "react";*/
+        $(function () {
+            bindSubmit();
+        })
+        function bindSubmit(){
+            $('#loginCheck').click(function () {
+                var name = $('#username').val();      //获取用户名
+                var pwd = $('#password').val();           //获取密码
+                var url = "https://uctest.eztalks.com:8443/cumeetingApi/api/uc/user/login";
+/*                $.ajax({
+                    url:url,
+                    type:'post',
+                    data:JSON.stringify({email:name,password:pwd}),
+                    ContentType:'application/json',
+                    beforeSend:function () {
+                        $('#loginCheck').val('Signing');
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        if(data['code']!==0){
+                            $('#password').val('');
+                            $('#password').attr('placeholder',"密码错误");
+                            $('#loginCheck').val('Sign in');
+                        }else{
+                             alert('ok');
+                        }
+                    }
+
+                })*/
+                msg="";
+                fetch(url, {
+                  method: 'POST', // or 'PUT'
+                  // credentials:'include',
+                  body: JSON.stringify({email:name,password:pwd}), // data can be `string` or {object}!
+                  headers: new Headers({
+                    'Content-Type': 'application/json'
+                  })
+                }).then(res => res.json())
+                    .then(json=>{
+                        if(json.code == 0){
+                            // localStorage.cookie =json.cookie
+                            // this.props.history.push('/server');
+                            window.location.href="/server";
+                        }else if(json.code !==0)
+                            console.log(json);
+                            msg="账号或密码错误";
+                            $('#errMsg').addClass('error');
+                            $('#errMsg').text(msg);
+                            $('#errMsg').show();
+                            // $("#errMsg").attr('')
+                            // alert(msg);
+                        }
+                    )
+                .catch(error => console.error('Error:', error))
+                .then(response => console.log('Success:', response));
+            })
+        }
+
+    </script>
+</body>
+</html>

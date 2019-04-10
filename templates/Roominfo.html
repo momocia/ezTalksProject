@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meetings Info | ezTalks</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+{#    <link href="https://vjs.zencdn.net/7.4.1/video-js.css" rel="stylesheet">#}
+{#    <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->#}
+{#    <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>#}
+</head>
+<body>
+<div style="padding: 20px 10px">
+    <div>
+        <form action="/roominfo" method="post" class="form-inline"style="padding-right: 500px;display: inline-block">
+            {% csrf_token %}
+          <div class="form-group">
+            <label for="exampleInputName2">会议室ID ：</label>
+            <input type="text" class="form-control" name="meetingid" placeholder="MeetingID">
+          </div>
+          <div style="padding-left: 7px;display: inline-block" >
+              <button type="submit" class="btn btn-default">查询</button>
+          </div>
+        </form>
+        <div style="padding-right: 100px;display: inline-block;float: right "  >
+          <a href="/server">运维平台</a>
+        </div>
+    </div>
+</div>
+    <div style="padding-left: 5px">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Dev_id</th>
+                    <th>Device_name</th>
+                    <th>Enter Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in roomlog_list %}
+                    <tr>
+                        <td>{{ row.username }}</td>
+                        <td>{{ row.dev_id }}</td>
+                        <td>{{ row.device_name }}</td>
+                        <td>{{ row.entertime }}</td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+{#    <div>#}
+{#        <video id='my-video' class='video-js' controls preload='auto' width='640' height='360'#}
+{#          poster='MY_VIDEO_POSTER.jpg' data-setup='{}'>#}
+{#            <source src='https://eztalkstest1.s3.amazonaws.com/99922/99922-1552447928210.MP4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190314T072808Z&X-Amz-SignedHeaders=host&X-Amz-Expires=598&X-Amz-Credential=AKIAI2RGQ4CNV5EE4TUA%2F20190314%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=2067d3741649e4b5d6e58293037ccdff86ff4c6117a1998f995af719682687d9' type='video/mp4'>#}
+{#            <p class='vjs-no-js'>#}
+{#              To view this video please enable JavaScript, and consider upgrading to a web browser that#}
+{#              <a href='https://videojs.com/html5-video-support/' target='_blank'>supports HTML5 video</a>#}
+{#            </p>#}
+{#          </video>#}
+{#    </div>#}
+{#    <script src='https://vjs.zencdn.net/7.4.1/video.js'></script>#}
+</body>
+</html>

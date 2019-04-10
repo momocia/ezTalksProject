@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Server | ezTalks</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        #loading {
+            position: absolute;
+            top:0;
+            left:0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1060;
+
+        }
+        .ec_tip{
+        display:none;
+        padding:5px;
+        position: absolute;
+        background: #555;
+        color:#fff;
+        border: 3px solid #555;
+        border-radius:10px;
+        z-index: 9999;
+        }
+        #loading img {
+            position: absolute;
+            top: 48%;
+            left: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header"style="padding: 0px 10px">
+      <h1 >
+          <small>测试环境服务器</small>
+          <a style="padding:25px 100px;display: inline-block;float: right;font-size: 15px" href="/roominfo">查询会议室</a>
+      </h1>
+    </div>
+    <div id="loading"></div>
+    <div style="padding: 20px 10px">
+          <div class="form-group form-inline">
+            <label for="JenkinsID" style="width: 160px;text-align: left;font-family: 'Microsoft YaHei'">Jenkins构建编号 :</label>
+            <input type="text" class="form-control" name="JenkinsID" placeholder="请输入3位Build号码">
+              <div style="padding-left: 7px;display: inline-block" >
+                  <button type="submit" class="btn btn-default" id="Deploy">Update</button>
+              </div>
+          </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="requirePWD">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" style="font-size: small;color: red">服务器隐私策略,请输入密码</h4>
+          </div>
+          <div class="modal-body">
+              <label for="serverPWD">Password:</label>
+              <input type="password" class="form-control" id="serverPWD" placeholder="Password">
+          </div>
+            <div>
+                <input style="display: none" type="text" id="JenID"/>
+            </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-danger" id="Confirm">确认</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+     <div style="padding: 0px 10px">
+          <label for="InputFile" style="width: 160px;text-align: left;font-family: 'Microsoft YaHei'">UC文件(dist.zip) :</label>
+          <input type="file" name="InputFile" id="uc_upload" style="display: inline-block;width: 196px">
+         <div style="padding-left: 7px;display: inline-block" >
+              <button type="submit" class="btn btn-info" onclick="ucUpload()">Update</button>
+          </div>
+     </div>
+     <div style="padding: 10px 10px">
+          <label for="InputFile" style="width: 160px;text-align: left;font-family: 'Microsoft YaHei'">Webinar文件(out.zip) :</label>
+          <input type="file" name="InputFile" id="webinar_upload" style="display: inline-block;width: 196px">
+         <div style="padding-left: 7px;display: inline-block" >
+              <button type="submit" class="btn btn-info" onclick="inarUpload()">Update</button>
+          </div>
+     </div>
+
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+    <SCRIPT type="text/javascript" >
+    //弹出提示效果
+    window.Alert = function(messages,callback){
+        if($(".ec_tip").length<1){
+            $("body").append("<div class=\"ec_tip\">"+messages+"</div>");
+        }
+        //定位居中显示
+        leftW = (document.body.clientWidth-$(".ec_tip").width())/2;
+        topH = (document.body.clientHeight-$(".ec_tip").height())/2;
+        $(".ec_tip").css("top", topH+"px").css("left", leftW+"px").fadeIn(2000);
+        //谈出效果并执行回调
+        $(".ec_tip").animate({top:"0px",opacity:0},2000,function(){
+            $(".ec_tip").remove();
+            if(callback!=undefined)
+                callback();
+        });
+    }
+    </SCRIPT>
+    <script>
+        $(function () {
+            bindDeploy();
+            bindConfirm();
+        })
+        function bindDeploy() {
+            $('#Deploy').click(function () {
+                var JenID = $(this).parent().prevAll('input').val();
+                if(JenID==''){
+                    Alert('请输入Jenkins构建编号');
+                    return false
+                }
+                else
+                    $('#requirePWD').modal('show');
+                    $('#JenID').val(JenID);
+            })
+
+        }
+        function bindConfirm() {
+            $('#Confirm').click(function () {
+
+                var JenID = $('#JenID').val();
+                var serverPWD = $('#serverPWD').val();
+                console.log(JenID);
+                console.log(serverPWD);
+                $.ajax({
+                    url: '/server',
+                    type: 'POST',
+                    data: {JenID: JenID,serverPWD:serverPWD},
+                    dataType:"json",
+                    success: function (arg) {
+                        if (arg=='Done') {
+                            console.log(arg);
+                            $('#requirePWD').modal('hide');
+                            //window.location.reload();
+                            Alert('服务器文件已更新，Tomcat重启中，约1min之后恢复正常服务.');
+                        } else {
+                            {#alert(arg);#}
+                            Alert(arg);
+
+                        }
+                    }
+                })
+            })
+        }
+        $(document).ajaxStart(function(){
+            $("#loading").html("<img src='/static/img/loading.gif'/>");
+            $('#loading').show();
+        }).ajaxStop(function(){
+            $("#loading").hide();
+        })
+
+        function ucUpload() {
+        var form_data = new FormData();
+        var file_info =$( '#uc_upload')[0].files[0];
+        form_data.append('file',file_info);
+        if(file_info==undefined){
+            Alert('你没有选择任何文件');
+            return false
+        }
+        else
+            $.ajax({
+                url:'/upload_ajax/',
+                type:'POST',
+                data: form_data,
+                processData: false,  // tell jquery not to process the data
+                contentType: false, // tell jquery not to set contentType
+                success: function(arg) {
+                    window.location.reload();
+                    alert(arg);
+
+                }
+            });
+        }
+        function inarUpload() {
+        var form_data = new FormData();
+        var file_info =$( '#webinar_upload')[0].files[0];
+        form_data.append('file',file_info);
+        if(file_info==undefined){
+            Alert('你没有选择任何文件');
+            return false
+        }
+        else
+            $.ajax({
+                url:'/webinar_upload',
+                type:'POST',
+                data: form_data,
+                processData: false,  // tell jquery not to process the data
+                contentType: false, // tell jquery not to set contentType
+                success: function(arg) {
+                    window.location.reload();
+                    alert(arg);
+
+                }
+            });
+        }
+    </script>
+</body>
+</html>
